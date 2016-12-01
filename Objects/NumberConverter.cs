@@ -45,48 +45,45 @@ namespace NumbersToWords.Objects
 
         public string Convert()
         {
-            string numberString = _number.ToString();
-            string[] digitStrings = numberString.ToCharArray().Select( n => n.ToString()).ToArray();
-            Array.Reverse(digitStrings);
-            string zeroString = "";
-            for (var idx = 0; idx < digitStrings.Length; idx++)
+            List<int> digits = new List<int> {};
+            int size = _number.ToString().Length;
+            string[] digitStrings = _number.ToString().ToCharArray().Select( n => n.ToString()).ToArray();
+            for (int idx = 0; idx < size; idx++)
             {
-                digitStrings[idx] += zeroString;
-                Console.WriteLine("digit: " + digitStrings[idx] + ", zeroString: " + zeroString);
-                zeroString += "0";
+                digits.Add(int.Parse(digitStrings[idx]));
             }
 
-            Array.Reverse(digitStrings);
-
             string result = "";
-            for (var idx = 0; idx < digitStrings.Length; idx++)
-            {
-                string digit = digitStrings[idx];
-                string word = "";
-                if(digit[0] == '0')
-                {
 
+            for (int idx = 0; idx < digits.Count; idx++)
+            {
+                int numberOfZero = digits.Count - 1;
+                string word = "";
+                if (digits.Count <= 2)
+                {
+                    if (digits.Count == 1)
+                    {
+                        word = _numberWords[digits[idx]];
+                    }
+                    else
+                    {
+                        int combinedIndex = int.Parse(digits[0].ToString() + digits[1].ToString());
+                        word = _numberWords[combinedIndex];
+                        idx++;
+                    }
                 }
                 else
                 {
-                    if(digit == "10")
-                    {
-                        word = _numberWords[int.Parse(digit) + int.Parse(digitStrings[idx+1])];
-                        idx++;
-                    }
-                    else
-                    {
-                        word = _numberWords[int.Parse(digit)];
-                    }
 
-                    if (result != "")
-                    {
-                        result += " " +  word;
-                    }
-                    else
-                    {
-                        result += word;
-                    }
+                }
+
+                if (result != "")
+                {
+                    result += " " + word;
+                }
+                else
+                {
+                    result = word;
                 }
             }
             return result;
