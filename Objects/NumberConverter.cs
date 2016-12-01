@@ -57,7 +57,7 @@ namespace NumbersToWords.Objects
 
             for (int idx = 0; idx < digits.Count; idx++)
             {
-                int numberOfZero = digits.Count - 1;
+                bool noSpace = false;
                 string word = "";
                 if (digits.Count <= 2)
                 {
@@ -74,16 +74,32 @@ namespace NumbersToWords.Objects
                 }
                 else
                 {
-
+                    noSpace = true;
+                    if (digits[idx] > 0)
+                    {
+                        noSpace = false;
+                        int numberOfZero = digits.Count - 1;
+                        word = _numberWords[digits[idx]];
+                        if (numberOfZero == 2)
+                        {
+                            word += " hundred";
+                        }
+                        else if (numberOfZero == 3)
+                        {
+                            word += " thousand";
+                        }
+                    }
+                    digits.RemoveAt(idx);
+                    idx--;
                 }
 
-                if (result != "")
+                if (noSpace || result == "")
                 {
-                    result += " " + word;
+                    result += word;
                 }
                 else
                 {
-                    result = word;
+                    result += " " + word;
                 }
             }
             return result;
