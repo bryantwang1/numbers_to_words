@@ -1,5 +1,5 @@
 using Nancy;
-using ScrabbleScore.Objects;
+using NumbersToWords.Objects;
 
 namespace NumbersToWords
 {
