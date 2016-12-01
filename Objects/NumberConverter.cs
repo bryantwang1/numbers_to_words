@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
+using System;
 
 namespace NumbersToWords.Objects
 {
@@ -43,7 +45,51 @@ namespace NumbersToWords.Objects
 
         public string Convert()
         {
-            return _numberWords[_number];
+            string numberString = _number.ToString();
+            string[] digitStrings = numberString.ToCharArray().Select( n => n.ToString()).ToArray();
+            Array.Reverse(digitStrings);
+            string zeroString = "";
+            for (var idx = 0; idx < digitStrings.Length; idx++)
+            {
+                digitStrings[idx] += zeroString;
+                Console.WriteLine("digit: " + digitStrings[idx] + ", zeroString: " + zeroString);
+                zeroString += "0";
+            }
+
+            Array.Reverse(digitStrings);
+
+            string result = "";
+            for (var idx = 0; idx < digitStrings.Length; idx++)
+            {
+                string digit = digitStrings[idx];
+                string word = "";
+                if(digit[0] == '0')
+                {
+
+                }
+                else
+                {
+                    if(digit == "10")
+                    {
+                        word = _numberWords[int.Parse(digit) + int.Parse(digitStrings[idx+1])];
+                        idx++;
+                    }
+                    else
+                    {
+                        word = _numberWords[int.Parse(digit)];
+                    }
+
+                    if (result != "")
+                    {
+                        result += " " +  word;
+                    }
+                    else
+                    {
+                        result += word;
+                    }
+                }
+            }
+            return result;
         }
     }
 }
