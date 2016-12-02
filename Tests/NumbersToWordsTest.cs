@@ -29,5 +29,21 @@ namespace NumbersToWordsTest
             string result = newConverter.Convert();
             Assert.Equal("eleven", result);
         }
+        [Fact]
+        public void NumbersConvertedToWords_NumberIs111_ReturnOneHundredEleven()
+        {
+            int input = 111;
+            NumberConverter newConverter = new NumberConverter(input);
+            string result = newConverter.Convert();
+            Assert.Equal("one hundred eleven", result);
+        }
+        [Fact]
+        public void NumbersConvertedToWords_NumberIs1111_ReturnOneThousandOneHundredEleven()
+        {
+            int input = 1111;
+            NumberConverter newConverter = new NumberConverter(input);
+            string result = newConverter.Convert();
+            Assert.Equal("one thousand one hundred eleven", result);
+        }
     }
 }
