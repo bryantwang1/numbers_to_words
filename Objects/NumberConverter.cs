@@ -55,6 +55,7 @@ namespace NumbersToWords.Objects
                 digits.Add(int.Parse(digitStrings[idx]));
             }
 
+            int skipAmount = 0;
             string word = "";
             int numberOfZero = digits.Count-1;
 
@@ -62,54 +63,65 @@ namespace NumbersToWords.Objects
             {
                 if(numberOfZero % 3 == 0)
                 {
+                    skipAmount++;
                     word = _numberWords[digits[0]];
                 }
                 else
                 {
-                    // This should find tens above 1000
-                    if(numberOfZero % 3 == 1)
+                    // This should find hundreds and tens
+                    if(numberOfZero % 3 >= 2)
                     {
-                        int key = int.Parse(digits[0].ToString() + digits[1].ToString());
-                        // This if should handle 1-20 or the other round tens (i.e. 30, 40)
-                        if(_numberWords.ContainsKey(key))
+                        if(numberOfZero % 3 == 2)
                         {
-                            word = _numberWords[digits[key]];
+                            skipAmount++;
+                            word = _numberWords[digits[0]] + " hundred";
                         }
-                        else
+                        // This should find tens
+                        else if(numberOfZero % 3 == 1)
                         {
-                            int key2 = int.Parse(digits[0].ToString() + "0");
-                            int key3 = digits[1];
-                            word = _numberWords[key2] + " " + _numberWords[key3];
+                            int twoDigitKey = int.Parse(digits[0].ToString() + digits[1].ToString());
+                            // This if should handle 1-20 or the other round tens (i.e. 30, 40)
+                            if(_numberWords.ContainsKey(twoDigitKey))
+                            {
+                                skipAmount += 2;
+                                word = _numberWords[digits[twoDigitKey]];
+                                numberOfZero--;
+                            }
+                            else
+                            {
+                                skipAmount++;
+                                int tensKey = int.Parse(digits[0].ToString() + "0");
+                                word = _numberWords[tensKey];
+                            }
                         }
-                    }
-                    // This should find hundreds above 1000
-                    else if(numberOfZero % 3 == 2)
-                    {
-                        int key = int.Parse(digits[0].ToString() + digits[1].ToString() + digits[2].ToString());
-                        word = _numberWords[digits[key]];
-                        // THIS NEEDS FLESHING OUT
-                    }
-
-                    if(numberOfZero >= 12)
-                    {
-                        word += " trillion";
-                    }
-                    else if(numberOfZero >= 9)
-                    {
-                        word += " billion";
-                    }
-                    else if(numberOfZero >= 6)
-                    {
-                        word += " million";
-                    }
-                    else if(numberOfZero >= 3)
-                    {
-                        word += " thousand";
                     }
                 }
+
+            }
+            else // if the digit is 0
+            {
+                skipAmount = 1;
+                word = "";
             }
 
-            if (_result == "")
+            if(numberOfZero == 12)
+            {
+                word += " trillion";
+            }
+            else if(numberOfZero == 9)
+            {
+                word += " billion";
+            }
+            else if(numberOfZero == 6)
+            {
+                word += " million";
+            }
+            else if(numberOfZero == 3)
+            {
+                word += " thousand";
+            }
+
+            if (_result == "" || word = "")
             {
                 _result += word;
             }
@@ -120,7 +132,7 @@ namespace NumbersToWords.Objects
 
             // ADJUST HOW MANY NUMBERS ARE REMOVED BASED ON WHAT HAS BEEN PASSED
             string stringForNumber = "";
-            for (int idx = 1; idx < digits.Count; idx++)
+            for (int idx = skipAmount; idx < digits.Count; idx++)
             {
                 stringForNumber += digits[idx].ToString();
             }
