@@ -7,6 +7,7 @@ namespace NumbersToWords.Objects
     public class NumberConverter
     {
         private int _number;
+        private string _result;
         private Dictionary<int, string> _numberWords = new Dictionary<int, string> ()
         {
             { 1, "one" },
@@ -41,6 +42,7 @@ namespace NumbersToWords.Objects
         public NumberConverter(int input)
         {
             _number = input;
+            _result = "";
         }
 
         public string Convert()
@@ -53,56 +55,83 @@ namespace NumbersToWords.Objects
                 digits.Add(int.Parse(digitStrings[idx]));
             }
 
-            string result = "";
+            string word = "";
+            int numberOfZero = digits.Count-1;
 
-            for (int idx = 0; idx < digits.Count; idx++)
+            if(digits[0] != 0)
             {
-                bool noSpace = false;
-                string word = "";
-                if (digits.Count <= 2)
+                if(numberOfZero % 3 == 0)
                 {
-                    if (digits.Count == 1)
-                    {
-                        word = _numberWords[digits[idx]];
-                    }
-                    else
-                    {
-                        int combinedIndex = int.Parse(digits[0].ToString() + digits[1].ToString());
-                        word = _numberWords[combinedIndex];
-                        idx++;
-                    }
+                    word = _numberWords[digits[0]];
                 }
                 else
                 {
-                    noSpace = true;
-                    if (digits[idx] > 0)
+                    // This should find tens above 1000
+                    if(numberOfZero % 3 == 1)
                     {
-                        noSpace = false;
-                        int numberOfZero = digits.Count - 1;
-                        word = _numberWords[digits[idx]];
-                        if (numberOfZero == 2)
+                        int key = int.Parse(digits[0].ToString() + digits[1].ToString());
+                        // This if should handle 1-20 or the other round tens (i.e. 30, 40)
+                        if(_numberWords.ContainsKey(key))
                         {
-                            word += " hundred";
+                            word = _numberWords[digits[key]];
                         }
-                        else if (numberOfZero == 3)
+                        else
                         {
-                            word += " thousand";
+                            int key2 = int.Parse(digits[0].ToString() + "0");
+                            int key3 = digits[1];
+                            word = _numberWords[key2] + " " + _numberWords[key3];
                         }
                     }
-                    digits.RemoveAt(idx);
-                    idx--;
-                }
+                    // This should find hundreds above 1000
+                    else if(numberOfZero % 3 == 2)
+                    {
+                        int key = int.Parse(digits[0].ToString() + digits[1].ToString() + digits[2].ToString());
+                        word = _numberWords[digits[key]];
+                        // THIS NEEDS FLESHING OUT
+                    }
 
-                if (noSpace || result == "")
-                {
-                    result += word;
-                }
-                else
-                {
-                    result += " " + word;
+                    if(numberOfZero >= 12)
+                    {
+                        word += " trillion";
+                    }
+                    else if(numberOfZero >= 9)
+                    {
+                        word += " billion";
+                    }
+                    else if(numberOfZero >= 6)
+                    {
+                        word += " million";
+                    }
+                    else if(numberOfZero >= 3)
+                    {
+                        word += " thousand";
+                    }
                 }
             }
-            return result;
+
+            if (_result == "")
+            {
+                _result += word;
+            }
+            else
+            {
+                _result += " " + word;
+            }
+
+            // ADJUST HOW MANY NUMBERS ARE REMOVED BASED ON WHAT HAS BEEN PASSED
+            string stringForNumber = "";
+            for (int idx = 1; idx < digits.Count; idx++)
+            {
+                stringForNumber += digits[idx].ToString();
+            }
+
+            if(stringForNumber != "")
+            {
+                _number = int.Parse(stringForNumber);
+                Convert();
+            }
+
+            return _result;
         }
     }
 }
