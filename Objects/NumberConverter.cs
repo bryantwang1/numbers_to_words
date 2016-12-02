@@ -6,9 +6,10 @@ namespace NumbersToWords.Objects
 {
     public class NumberConverter
     {
-        private int _number;
+        private long _number;
         private string _result;
-        private Dictionary<int, string> _numberWords = new Dictionary<int, string> ()
+        private long _countdown;
+        private Dictionary<long, string> _numberWords = new Dictionary<long, string> ()
         {
             { 1, "one" },
             { 2, "two" },
@@ -39,20 +40,22 @@ namespace NumbersToWords.Objects
             { 90, "ninety" },
         };
 
-        public NumberConverter(int input)
+        public NumberConverter(long input)
         {
             _number = input;
             _result = "";
+            // safeguard against stack overflow
+            _countdown = input.ToString().Length;
         }
 
         public string Convert()
         {
-            List<int> digits = new List<int> {};
+            List<long> digits = new List<long> {};
             int size = _number.ToString().Length;
             string[] digitStrings = _number.ToString().ToCharArray().Select( n => n.ToString()).ToArray();
             for (int idx = 0; idx < size; idx++)
             {
-                digits.Add(int.Parse(digitStrings[idx]));
+                digits.Add(Int64.Parse(digitStrings[idx]));
             }
 
             int skipAmount = 0;
@@ -69,7 +72,7 @@ namespace NumbersToWords.Objects
                 else
                 {
                     // This should find hundreds and tens
-                    if(numberOfZero % 3 >= 2)
+                    if(numberOfZero % 3 <= 2)
                     {
                         if(numberOfZero % 3 == 2)
                         {
@@ -84,7 +87,7 @@ namespace NumbersToWords.Objects
                             if(_numberWords.ContainsKey(twoDigitKey))
                             {
                                 skipAmount += 2;
-                                word = _numberWords[digits[twoDigitKey]];
+                                word = _numberWords[twoDigitKey];
                                 numberOfZero--;
                             }
                             else
@@ -103,7 +106,6 @@ namespace NumbersToWords.Objects
                 skipAmount = 1;
                 word = "";
             }
-
             if(numberOfZero == 12)
             {
                 word += " trillion";
@@ -121,7 +123,7 @@ namespace NumbersToWords.Objects
                 word += " thousand";
             }
 
-            if (_result == "" || word = "")
+            if (_result == "" || word == "")
             {
                 _result += word;
             }
@@ -137,12 +139,13 @@ namespace NumbersToWords.Objects
                 stringForNumber += digits[idx].ToString();
             }
 
-            if(stringForNumber != "")
+            if(stringForNumber != "" && _countdown > 1)
             {
-                _number = int.Parse(stringForNumber);
+                _number = Int64.Parse(stringForNumber);
+                _countdown--;
                 Convert();
             }
-
+            Console.WriteLine("result: " + _result);
             return _result;
         }
     }
